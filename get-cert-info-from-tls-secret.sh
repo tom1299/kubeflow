@@ -14,4 +14,4 @@ namespace=$1
 secret_name=$2
 
 # Get the secret and directly pass it to openssl
-kubectl get secret "$secret_name" -n "$namespace" -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -text -noout
+kubectl get secret "$secret_name" -n "$namespace" -o jsonpath='{.data.cert\.pem}' | base64 -d | openssl x509 -text -noout
