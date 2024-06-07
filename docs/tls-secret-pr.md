@@ -31,3 +31,9 @@
     ```bash
     kubectl rollout restart deployment cache-deployer-deployment -n kubeflow
     ```
+
+The same has to be done for the cache server deployment as well.
+The build command looks like this:
+```
+podman build -t cache-server-test:1.2.3 -f backend/Dockerfile.cacheserver .
+```
