@@ -1,7 +1,18 @@
 import yaml
 import sys
+import os
 
 def convert_to_debug_pod(pod):
+    # Check if the required fields exist in the pod
+    required_fields = ['spec', 'metadata']
+    for field in required_fields:
+        if field not in pod:
+            raise ValueError(f"Missing required field: {field}")
+
+    # Check if 'name' exists in 'metadata'
+    if 'name' not in pod['metadata']:
+        raise ValueError("Missing required field: metadata.name")
+
     # Iterate over all containers
     for container in pod['spec']['containers']:
         # Remove liveness, readiness and startup probes
@@ -42,8 +53,18 @@ def main():
         sys.exit(1)
 
     pod_file = sys.argv[1]
+
+    # Validate the input file
+    if not os.path.isfile(pod_file):
+        print(f"Error: File '{pod_file}' does not exist.")
+        sys.exit(1)
+
     with open(pod_file, 'r') as f:
-        pod = yaml.safe_load(f)
+        try:
+            pod = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            print(f"Error: Invalid YAML file '{pod_file}': {e}")
+            sys.exit(1)
 
     debug_pod = convert_to_debug_pod(pod)
 
@@ -57,7 +78,6 @@ def main():
         yaml.dump(debug_pod, f)
 
     print(yaml.dump(debug_pod))
-
 
 if __name__ == '__main__':
     main()
