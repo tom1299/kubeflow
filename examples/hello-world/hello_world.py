@@ -1,5 +1,6 @@
 from kfp import Client, compiler, dsl
-from examples import http_proxy, https_proxy, no_proxy, ML_PIPELINE_HOST
+from examples import ML_PIPELINE_HOST
+from examples.utils.proxy import add_proxy_env_vars
 
 
 @dsl.component(
@@ -12,7 +13,7 @@ def say_hello():
 
 @dsl.pipeline
 def hello_pipeline():
-    say_hello().set_env_variable('http_proxy',http_proxy).set_env_variable('https_proxy',https_proxy).set_env_variable('no_proxy',no_proxy)
+    add_proxy_env_vars(say_hello())
 
 
 compiler.Compiler().compile(hello_pipeline, 'hello_pipeline.yaml')

@@ -1,14 +1,8 @@
 import argparse
+
 from kubernetes import client
 
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--apiserver', required=True, help='API server URL')
-    parser.add_argument('--namespaces', required=True, help='Comma-separated list of namespaces')
-    args = parser.parse_args()
-
-    return get_no_proxy_var(args.apiserver, args.namespaces.split(','))
+import os
 
 
 def get_no_proxy_var(apiserver, namespaces):
@@ -37,5 +31,10 @@ def get_no_proxy_var(apiserver, namespaces):
     return no_proxy_var
 
 
-if __name__ == '__main__':
-    main()
+http_proxy=os.getenv('http_proxy')
+https_proxy=os.getenv('https_proxy')
+no_proxy=os.getenv('no_proxy') + "," + get_no_proxy_var("https://127.0.0.1:6443", ["default", "kubeflow"])
+
+
+def add_proxy_env_vars(function):
+    function.set_env_variable('http_proxy', http_proxy).set_env_variable('https_proxy', https_proxy).set_env_variable('no_proxy', no_proxy)
