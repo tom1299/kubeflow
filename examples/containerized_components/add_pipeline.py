@@ -1,3 +1,4 @@
+import tempfile
 from kfp import Client, dsl, compiler
 from my_component import add
 from examples import ML_PIPELINE_HOST
@@ -13,11 +14,20 @@ def addition_pipeline(x: int, y: int) -> int:
     return task2.output
 
 
-compiler.Compiler().compile(addition_pipeline, 'addition_pipeline.yaml')
+# Create a temporary file
+with tempfile.NamedTemporaryFile(suffix=".yaml", delete=True) as temp:
+    # Compile the pipeline to the temporary file
+    compiler.Compiler().compile(addition_pipeline, temp.name)
 
-arguments = {'x': 1, 'y': 2}
+    # Read the contents of the file and print them
+    with open(temp.name, 'r') as f:
+        print(f.read())
 
-client = Client(host=ML_PIPELINE_HOST)
-run = client.create_run_from_pipeline_package(
-    'addition_pipeline.yaml', arguments=arguments, run_name="addition_pipeline_run1", experiment_name="addition_pipeline_exp1", enable_caching=False
-)
+    arguments = {'x': 1, 'y': 2}
+
+    client = Client(host=ML_PIPELINE_HOST)
+    # Run the pipeline from the temporary file
+    run = client.create_run_from_pipeline_package(
+        temp.name, arguments=arguments, run_name="addition_pipeline_run1", experiment_name="addition_pipeline_exp1",
+        enable_caching=False
+    )
