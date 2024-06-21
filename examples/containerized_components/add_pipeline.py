@@ -1,6 +1,6 @@
 import tempfile
 from kfp import Client, dsl, compiler
-from my_component import add
+from examples.containerized_components.my_component import add
 from examples import ML_PIPELINE_HOST
 from examples.utils.proxy import add_proxy_env_vars
 

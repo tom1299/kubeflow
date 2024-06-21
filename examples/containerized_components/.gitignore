@@ -1,0 +1,5 @@
+.dockerignore
+kfp_config.ini
+runtime-requirements.txt
+component_metadata
+Dockerfile
